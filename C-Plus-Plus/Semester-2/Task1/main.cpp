@@ -6,7 +6,7 @@ int main() {
 
     double l, w, h;
 
-    std::cout << "������� �����, ������ � ������ ������\n";
+    std::cout << "Enter RectangPP`s dimensions: \n";
 
     std::cin >> l;
     std::cin >> w;
