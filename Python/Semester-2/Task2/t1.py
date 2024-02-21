@@ -18,7 +18,7 @@ def print_pascal_triangle(triangle):
         print(row_str.center(max_width))
 
 
-# Пример использования:
-n = int(input("Введите количество строк треугольника Паскаля: "))
-pascal_triangle = generate_pascal_triangle(n)
-print_pascal_triangle(pascal_triangle)
+if __name__ == '__main__':
+    n = int(input("Введите количество строк треугольника Паскаля: "))
+    pascal_triangle = generate_pascal_triangle(n)
+    print_pascal_triangle(pascal_triangle)

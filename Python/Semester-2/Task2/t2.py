@@ -1,23 +1,27 @@
-def draw_sierpinski_triangle(n, x_offset, y_offset, size, canvas):
-    if n == 0:
-        for i in range(size):
-            for j in range(i + 1):
-                canvas[y_offset + i][x_offset + j] = '*'
-    else:
-        draw_sierpinski_triangle(n - 1, x_offset, y_offset, size // 2, canvas)  # верхний треугольник
-        draw_sierpinski_triangle(n - 1, x_offset + size // 2, y_offset, size // 2, canvas)  # правый треугольник
-        draw_sierpinski_triangle(n - 1, x_offset + size // 4, y_offset + size // 2, size // 2, canvas)  # нижний треугольник
+def printSierpinski(n):
+    n = 2 ** n
+    y = (n - 1)
 
-def print_canvas(canvas):
-    for row in canvas:
-        print(' '.join(row))
+    while y >= 0:
+        i = 0
 
-# Инициализация пустого холста
-size = 32  # Размер холста
-canvas = [[' ' for _ in range(size)] for _ in range(size)]
+        while i < y:
+            print(" ", end="")
+            i += 1
 
-# Рисуем треугольник Серпинского на холсте
-draw_sierpinski_triangle(3, 0, 0, size, canvas)
+        x = 0
 
-# Выводим холст на экран
-print_canvas(canvas)
+        while x + y < n:
+            if (x & y) != 0:
+                print(" ", end=" ")
+            else:
+                print("* ", end="")
+            x += 1
+
+        print()
+        y -= 1
+
+
+if __name__ == '__main__':
+    n = int(input("Введите ранг треугольника Серпинского: "))
+    printSierpinski(n)
