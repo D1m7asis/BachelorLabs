@@ -46,7 +46,7 @@ struct Josh {
 };
 
 void zoomOut(sf::RenderWindow* window, unsigned int frame) {
-    float multiplier = 1000.0;
+    float multiplier = 950.0;
 
     sf::View view = window->getView();
     view.setSize(sf::Vector2f(1.1*WIDTH - (WIDTH * multiplier / frame), 1.1*HEIGHT - (HEIGHT * multiplier / frame)));
@@ -77,6 +77,16 @@ int main() {
     music.setVolume(50.f);
     music.setPitch(1.1f);
     music.play();
+
+    sf::Text text;
+    sf::Font font;
+    font.loadFromFile("../ext/font/LuckiestGuy.ttf");
+    text.setFont(font);
+    text.setString("Whistle baby");
+    text.setCharacterSize(24);
+    text.setStyle(sf::Text::Bold | sf::Text::Underlined);
+    text.setPosition((WIDTH / 2) - 90,  (HEIGHT / 2) - 160);
+    text.setOutlineThickness(.6f);
 
     std::vector<Josh> joshes;
     for (int i = 0; i < NUM_JOSHES; ++i) {
@@ -130,17 +140,21 @@ int main() {
             }
         }
 
-        // Создаем градиент радуги в качестве фона
+        // Создаем градиент радуги в качестве фона и заливки текста
         sf::RectangleShape background(sf::Vector2f(WIDTH, HEIGHT));
         for (int i = 0; i < WIDTH; ++i) {
             background.setFillColor(rainbowColor(frame + i));
             window.draw(background);
         }
 
+        text.setFillColor(background.getFillColor());
+
         for (const auto& josh : joshes) {
             window.draw(josh.sprite);
         }
+
         window.draw(circleJosh);
+        window.draw(text);
         window.display();
     }
 
