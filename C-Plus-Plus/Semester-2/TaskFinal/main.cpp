@@ -21,7 +21,7 @@ public:
 
     Ball(float radius, float pos_x, float pos_y) : radius(radius) {
         sf::Texture ballTexture;
-        ballTexture.loadFromFile("../ext/ball.jpg");
+        ballTexture.loadFromFile("images/ball.jpg");
 
         ball.setRadius(radius);
         ball.setOrigin(sf::Vector2f(radius, radius));
@@ -77,7 +77,7 @@ int main() {
 
     std::vector<Ball> balls;
     sf::Texture ballTexture;
-    ballTexture.loadFromFile("../ext/ball.jpg");
+    ballTexture.loadFromFile("images/ball.jpg");
 
     float r1 = 50.f;
     float r2 = 100.f;
@@ -92,25 +92,25 @@ int main() {
 
     sf::RectangleShape background(sf::Vector2f(WIDTH, HEIGHT));
     sf::Texture sky;
-    sky.loadFromFile("../ext/sky.jpg");
+    sky.loadFromFile("images/sky.jpg");
     background.setTexture(&sky);
 
     sf::RectangleShape ground(sf::Vector2f(WIDTH, 300));
     sf::Texture grass;
-    grass.loadFromFile("../ext/grass.jpg");
+    grass.loadFromFile("images/grass.jpg");
     ground.setTexture(&grass);
     ground.setPosition(0, GROUND_HEIGHT);
 
     sf::RectangleShape mouse(sf::Vector2f(100, 100));
     sf::Texture mouse_texture;
-    mouse_texture.loadFromFile("../ext/mouse.png");
+    mouse_texture.loadFromFile("images/mouse.png");
     mouse.setTexture(&mouse_texture);
     mouse.setPosition(WIDTH-mouse.getSize().x, 0);
 
     sf::RectangleShape arrow(sf::Vector2f(200, 100));
     sf::Texture arrow_texture;
     arrow.rotate(-90);
-    arrow_texture.loadFromFile("../ext/arrow.jpg");
+    arrow_texture.loadFromFile("images/arrow.jpg");
     arrow.setTexture(&arrow_texture);
     arrow.setPosition(WIDTH-arrow.getSize().y / 2, mouse.getSize().y + arrow.getSize().y);
     arrow.setOrigin(arrow.getSize().x/2, arrow.getSize().y/2);

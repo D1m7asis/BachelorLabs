@@ -15,6 +15,9 @@ include_directories("ext/SFML/include/")
 include_directories("inc/")
 link_directories("ext/SFML/lib/")	
 
+file(COPY "images" DESTINATION "/")
+
+
 add_executable("${PROJECT_NAME}" main.cpp
 		
 )
