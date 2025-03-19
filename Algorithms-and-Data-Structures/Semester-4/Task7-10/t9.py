@@ -1,9 +1,6 @@
-from itertools import permutations
-
-
-def tsp_bruteforce(adj_matrix):
+def tsp_dp(adj_matrix):
     """
-    Решает задачу коммивояжёра (TSP) полным перебором всех маршрутов.
+    Решает задачу коммивояжёра (TSP) с помощью динамического программирования по подмножествам (Held-Karp Algorithm).
 
     Аргументы:
       adj_matrix: Квадратная матрица n x n, где adj_matrix[i][j] — стоимость перехода из города i в город j.
@@ -12,35 +9,37 @@ def tsp_bruteforce(adj_matrix):
       Минимальную стоимость обхода всех городов и возврата в начальный.
     """
     n = len(adj_matrix)
-    cities = list(range(1, n))  # Все города, кроме начального (0)
+    dp = [[float('inf')] * n for _ in range(1 << n)]
+    dp[1][0] = 0  # Базовый случай: стартуем из города 0
+
+    for mask in range(1 << n):
+        for u in range(n):
+            if not (mask & (1 << u)):
+                continue  # Город u не посещён в этом подмножестве
+
+            for v in range(n):
+                if mask & (1 << v) or u == v:
+                    continue  # Город v уже посещён или совпадает с u
+
+                next_mask = mask | (1 << v)
+                dp[next_mask][v] = min(dp[next_mask][v],
+                                       dp[mask][u] + adj_matrix[u][v])
+
+    # Финальный шаг — возвращение в начальный город (0)
     min_cost = float('inf')
-
-    # Перебираем все возможные перестановки маршрутов (кроме 0, т.к. он фиксирован)
-    for perm in permutations(cities):
-        cost = 0
-        current_city = 0
-
-        # Считаем стоимость маршрута
-        for next_city in perm:
-            cost += adj_matrix[current_city][next_city]
-            current_city = next_city
-
-        # Возвращаемся в начальный город
-        cost += adj_matrix[current_city][0]
-
-        # Обновляем минимум
-        min_cost = min(min_cost, cost)
+    full_mask = (1 << n) - 1
+    for u in range(1, n):
+        min_cost = min(min_cost, dp[full_mask][u] + adj_matrix[u][0])
 
     return min_cost
 
 
 if __name__ == '__main__':
-    # Пример матрицы связности для 4 городов
     adj_matrix = [
         [0, 10, 15, 20],
         [10, 0, 35, 25],
         [15, 35, 0, 30],
         [20, 25, 30, 0]
     ]
-    result = tsp_bruteforce(adj_matrix)
+    result = tsp_dp(adj_matrix)
     print("Минимальная стоимость маршрута:", result)
