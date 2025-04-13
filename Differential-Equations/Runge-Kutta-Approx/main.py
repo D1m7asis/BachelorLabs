@@ -11,31 +11,33 @@ GIVEN_EXACT_SOLUTION = "x * exp(1 / x)"
 
 TABLE_WIDTH = 71
 
+global given_func, true_solution
 
-def f(x, y, func):
+
+def f(x, y):
     """Вычисление правой части уравнения по строке функции."""
-    return func.subs({'x': x, 'y': y})
+    return given_func.subs({'x': x, 'y': y})
 
 
-def exact_solution(x, exact_func):
+def true_solution_at_point(x):
     """Вычисление точного решения по строке аналитического решения."""
-    return exact_func.subs({'x': x})
+    return true_solution.subs({'x': x})
 
 
-def runge_kutta_step(x, y, h, func):
-    """Один шаг метода Рунге-Кутта с учетом переданной функции."""
-    k1 = f(x, y, func)
-    k2 = f(x + h / 2, y + h * k1 / 2, func)
-    k3 = f(x + h / 2, y + h * k2 / 2, func)
-    k4 = f(x + h, y + h * k3, func)
+def runge_kutta_step(x, y, h):
+    """Один шаг метода Рунге-Кутта по функции."""
+    k1 = f(x, y)
+    k2 = f(x + h / 2, y + h * k1 / 2)
+    k3 = f(x + h / 2, y + h * k2 / 2)
+    k4 = f(x + h, y + h * k3)
     return y + (h / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
 
 
-def compute_solution(a, b, y0, h, epsilon, func, exact_func):
+def compute_solution(a, b, y0, h, epsilon):
     """Решение задачи методом Рунге-Кутта с изменяющимся шагом."""
     x_values = [a]
     y_values = [y0]
-    exact_values = [exact_solution(a, exact_func)]
+    exact_values = [true_solution_at_point(a)]
     errors = [0]
     h_values = [h]
 
@@ -47,9 +49,9 @@ def compute_solution(a, b, y0, h, epsilon, func, exact_func):
         if x + h_current > b:
             h_current = b - x
 
-        y_half1 = runge_kutta_step(x, y, h_current / 2, func)
-        y_half2 = runge_kutta_step(x + h_current / 2, y_half1, h_current / 2, func)
-        y_full = runge_kutta_step(x, y, h_current, func)
+        y_half1 = runge_kutta_step(x, y, h_current / 2)
+        y_half2 = runge_kutta_step(x + h_current / 2, y_half1, h_current / 2)
+        y_full = runge_kutta_step(x, y, h_current)
 
         error_estimate = abs(y_half2 - y_full)
 
@@ -58,7 +60,7 @@ def compute_solution(a, b, y0, h, epsilon, func, exact_func):
             y = y_half2
             x_values.append(x)
             y_values.append(y)
-            exact = exact_solution(x, exact_func)
+            exact = true_solution_at_point(x)
             exact_values.append(exact)
             errors.append(abs(y - exact))
             h_values.append(h_current)
@@ -177,13 +179,17 @@ class Application(tk.Frame):
             right_side_str = self.right_side_entry.get().strip()
 
             # Преобразуем строковые выражения в функции
-            true_solution = sympify(exact_solution_str)
+
+            global given_func
+            global true_solution
+
             given_func = sympify(right_side_str)
+            true_solution = sympify(exact_solution_str)
 
             if not self.validate_args(a, b, h, eps):
                 return
 
-            x_vals, y_vals, exact_vals, errors, h_values = compute_solution(a, b, y0, h, eps, given_func, true_solution)
+            x_vals, y_vals, exact_vals, errors, h_values = compute_solution(a, b, y0, h, eps)
 
             # Таблица
             self.output.configure(state='normal')
@@ -225,7 +231,7 @@ class Application(tk.Frame):
 
         x_vals_float = list(map(float, x))
         x_dense = np.linspace(min(x_vals_float), max(x_vals_float), 1000)
-        exact_dense = [float(exact_solution(xi, sympify(self.exact_solution_entry.get().strip()))) for xi in x_dense]
+        exact_dense = [float(true_solution_at_point(xi)) for xi in x_dense]
 
         ax1.plot(x_dense, exact_dense, label="Точное", color="red", linestyle='--', linewidth=2.5)
         ax1.set_title("Сравнение решений")
