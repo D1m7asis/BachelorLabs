@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import messagebox
-
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -15,17 +14,17 @@ global given_func, true_solution
 
 
 def f(x, y):
-    """Вычисление правой части уравнения по строке функции."""
+    """Вычисление правой части уравнения."""
     return given_func.subs({'x': x, 'y': y})
 
 
 def true_solution_at_point(x):
-    """Вычисление точного решения по строке аналитического решения."""
+    """Вычисление точного решения."""
     return true_solution.subs({'x': x})
 
 
 def runge_kutta_step(x, y, h):
-    """Один шаг метода Рунге-Кутта по функции."""
+    """Один шаг метода Рунге-Кутта 4-го порядка."""
     k1 = f(x, y)
     k2 = f(x + h / 2, y + h * k1 / 2)
     k3 = f(x + h / 2, y + h * k2 / 2)
@@ -33,8 +32,17 @@ def runge_kutta_step(x, y, h):
     return y + (h / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
 
 
+def margin_of_error(x, y, h):
+    """Оценка погрешности по правилу Рунге."""
+    k1 = f(x, y)
+    k2 = f(x + h / 2, y + (h * k1) / 2)
+    k3 = f(x + h / 2, y + (h * k2) / 2)
+    k4 = f(x + h, y + (h * k3))
+    return abs((k3 + k2) - (k4 + k1)) / 15
+
+
 def compute_solution(a, b, y0, h, epsilon):
-    """Решение задачи методом Рунге-Кутта с изменяющимся шагом."""
+    """Решение с автоматическим выбором шага по правилу Рунге."""
     x_values = [a]
     y_values = [y0]
     exact_values = [true_solution_at_point(a)]
@@ -49,15 +57,14 @@ def compute_solution(a, b, y0, h, epsilon):
         if x + h_current > b:
             h_current = b - x
 
-        y_half1 = runge_kutta_step(x, y, h_current / 2)
-        y_half2 = runge_kutta_step(x + h_current / 2, y_half1, h_current / 2)
-        y_full = runge_kutta_step(x, y, h_current)
+        error_est = margin_of_error(x, y, h_current)
 
-        error_estimate = abs(y_half2 - y_full)
-
-        if error_estimate < epsilon:
+        if error_est <= epsilon:
+            # Принимаем шаг
+            y_new = runge_kutta_step(x, y, h_current)
             x += h_current
-            y = y_half2
+            y = y_new
+
             x_values.append(x)
             y_values.append(y)
             exact = true_solution_at_point(x)
@@ -65,12 +72,14 @@ def compute_solution(a, b, y0, h, epsilon):
             errors.append(abs(y - exact))
             h_values.append(h_current)
 
-            if error_estimate < epsilon / 4:
+            # Адаптация шага
+            if error_est < epsilon / 32:
                 h_current *= 2
         else:
+            # Уменьшаем шаг
             h_current /= 2
-            if h_current < 1e-6:
-                messagebox.showerror("Ошибка", "Шаг стал слишком маленьким. Увеличьте ε.")
+            if h_current < 1e-10:
+                messagebox.showerror("Ошибка", "Шаг стал слишком маленьким. Увеличьте ε или измените параметры.")
                 break
 
     return x_values, y_values, exact_values, errors, h_values
@@ -146,9 +155,7 @@ class Application(tk.Frame):
     def parse_entry(entry):
         """Парсинг введенного значения"""
         from sympy import E
-
         locals_dict = {'e': E}
-
         return sympify(entry.get().strip().lower(), locals=locals_dict)
 
     @staticmethod
@@ -156,42 +163,32 @@ class Application(tk.Frame):
         if a >= b:
             messagebox.showerror("Ошибка", "Конец интервала должен быть больше начала.")
             return False
-
         if not h > 0:
             messagebox.showerror("Ошибка", "Начальный шаг должен быть строго больше нуля!")
             return False
-
         if not eps > 0:
             messagebox.showerror("Ошибка", "Значение точности (эпсилон) должно быть строго больше нуля!")
             return False
-
         return True
 
     def start_calculation(self):
         try:
-            a = self.parse_entry(self.a_entry)  # Начало области
-            b = self.parse_entry(self.b_entry)  # Конец области
-            y0 = self.parse_entry(self.y0_entry)  # Начальное условие от а
-            h = self.parse_entry(self.h_entry)  # Шаг
-            eps = self.parse_entry(self.eps_entry)  # Точность эпсилон
+            a = self.parse_entry(self.a_entry)
+            b = self.parse_entry(self.b_entry)
+            y0 = self.parse_entry(self.y0_entry)
+            h = self.parse_entry(self.h_entry)
+            eps = self.parse_entry(self.eps_entry)
 
-            exact_solution_str = self.exact_solution_entry.get().strip()
-            right_side_str = self.right_side_entry.get().strip()
-
-            # Преобразуем строковые выражения в функции
-
-            global given_func
-            global true_solution
-
-            given_func = sympify(right_side_str)
-            true_solution = sympify(exact_solution_str)
+            global given_func, true_solution
+            given_func = sympify(self.right_side_entry.get().strip())
+            true_solution = sympify(self.exact_solution_entry.get().strip())
 
             if not self.validate_args(a, b, h, eps):
                 return
 
             x_vals, y_vals, exact_vals, errors, h_values = compute_solution(a, b, y0, h, eps)
 
-            # Таблица
+            # Вывод таблицы
             self.output.configure(state='normal')
             self.output.delete("1.0", tk.END)
             self.output.insert(tk.END, f"{'x':<10}"
@@ -202,7 +199,6 @@ class Application(tk.Frame):
             self.output.insert(tk.END, "=" * TABLE_WIDTH + "\n")
 
             for x_i, y_i, e_i, err_i, h_i in zip(x_vals, y_vals, exact_vals, errors, h_values):
-                print(err_i)
                 self.output.insert(tk.END, f"{float(x_i):<10.5f}"
                                            f"{float(y_i):<15.8f}"
                                            f"{float(e_i):<15.8f}"
@@ -216,8 +212,7 @@ class Application(tk.Frame):
             messagebox.showerror("Ошибка", "Пожалуйста, введите корректные значения.")
             raise e
         except Exception as e:
-            messagebox.showerror("Ошибка", f"Ошибка вычислений: {e}")
-            raise e
+            messagebox.showerror("Ошибка", f"Ошибка вычислений: {str(e)}")
 
     def show_plot(self, x, y, errors):
         if self.canvas:
@@ -242,7 +237,7 @@ class Application(tk.Frame):
 
         ax2.plot(x, errors, color="green")
         ax2.set_title("Погрешность на шаге")
-        ax2.set_xlabel("x")  # Независимая переменная
+        ax2.set_xlabel("x")
         ax2.yaxis.set_label_position("right")
         ax2.yaxis.tick_right()
         ax2.set_ylabel("Погрешность", labelpad=15)
