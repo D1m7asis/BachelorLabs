@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -29,6 +30,7 @@ def runge_kutta_step(x, y, h):
     k2 = f(x + h / 2, y + h * k1 / 2)
     k3 = f(x + h / 2, y + h * k2 / 2)
     k4 = f(x + h, y + h * k3)
+
     return y + (h / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
 
 
@@ -38,7 +40,11 @@ def margin_of_error(x, y, h):
     k2 = f(x + h / 2, y + (h * k1) / 2)
     k3 = f(x + h / 2, y + (h * k2) / 2)
     k4 = f(x + h, y + (h * k3))
-    return abs((k3 + k2) - (k4 + k1)) / 15
+
+    y_i_h2 = (k3 + k2)
+    y_i_h = (k4 + k1)
+
+    return abs(y_i_h2 - y_i_h) / 15
 
 
 def compute_solution(a, b, y0, h, epsilon):
