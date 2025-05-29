@@ -3,7 +3,6 @@ from tkinter import messagebox
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from sympy import sympify
 
 GIVEN_RIGHT_SIDE = "(x - 1) * y / x ** 2"
@@ -114,6 +113,8 @@ class Application(tk.Frame):
         self.exact_solution_entry = tk.Entry(self)
         self.right_side_entry = tk.Entry(self)
 
+        self.show_error_plot_var = tk.BooleanVar()
+
         self.create_widgets()
 
     def create_widgets(self):
@@ -140,10 +141,12 @@ class Application(tk.Frame):
         tk.Label(self, text="Аналитическое решение:").grid(row=5, column=0, sticky="w", padx=10, pady=5)
         self.exact_solution_entry.grid(row=5, column=1, padx=10, pady=5)
         self.exact_solution_entry.insert(0, GIVEN_EXACT_SOLUTION)
+        self.exact_solution_entry.configure(state="readonly")
 
         tk.Label(self, text="Правая часть уравнения:").grid(row=6, column=0, sticky="w", padx=10, pady=5)
         self.right_side_entry.grid(row=6, column=1, padx=10, pady=5)
         self.right_side_entry.insert(0, GIVEN_RIGHT_SIDE)
+        self.right_side_entry.configure(state="readonly")
 
         self.start_btn = tk.Button(self, text="Старт", command=self.start_calculation)
         self.start_btn.grid(row=7, column=0, pady=10)
@@ -154,6 +157,8 @@ class Application(tk.Frame):
         self.output = tk.Text(self, height=15, width=TABLE_WIDTH, state=tk.DISABLED)
         self.output.grid(row=8, column=0, columnspan=2, pady=10)
 
+        tk.Checkbutton(self, text="Показать график погрешностей", variable=self.show_error_plot_var).grid(row=7,
+                                                                                                          columnspan=2)
         self.plot_frame = tk.Frame(self)
         self.plot_frame.grid(row=9, column=0, columnspan=2)
 
@@ -221,38 +226,38 @@ class Application(tk.Frame):
             messagebox.showerror("Ошибка", f"Ошибка вычислений: {str(e)}")
 
     def show_plot(self, x, y, errors):
-        if self.canvas:
-            self.canvas.get_tk_widget().destroy()
-
-        self.figure = plt.Figure(figsize=(10, 4), dpi=100)
-        ax1 = self.figure.add_subplot(121)
-        ax2 = self.figure.add_subplot(122)
-
-        ax1.plot(x, y, label="Численное", color="blue")
-
         x_vals_float = list(map(float, x))
-        x_dense = np.linspace(min(x_vals_float), max(x_vals_float), 1000)
+        y_vals_float = list(map(float, y))
+
+        # --- График решений ---
+        fig1 = plt.figure(figsize=(8, 4), dpi=100)
+        ax_main = fig1.add_subplot(1, 1, 1)
+
+        x_dense = np.linspace(x_vals_float[0], x_vals_float[-1], 1000)
         exact_dense = [float(true_solution_at_point(xi)) for xi in x_dense]
+        ax_main.plot(x_dense, exact_dense, 'k--', label="Точное")  # чёрная пунктирная линия
+        ax_main.plot(x_vals_float, y_vals_float, 'ro', label="Численное")  # красные точки
 
-        ax1.plot(x_dense, exact_dense, label="Точное", color="red", linestyle='--', linewidth=2.5)
-        ax1.set_title("Сравнение решений")
-        ax1.set_xlabel("x")
-        ax1.set_ylabel("y")
-        ax1.legend()
-        ax1.grid(True)
+        ax_main.set_title("Сравнение решений")
+        ax_main.set_xlabel("x")
+        ax_main.set_ylabel("y")
+        ax_main.grid(True)
+        ax_main.legend()
 
-        ax2.plot(x, errors, color="green")
-        ax2.set_title("Погрешность на шаге")
-        ax2.set_xlabel("x")
-        ax2.yaxis.set_label_position("right")
-        ax2.yaxis.tick_right()
-        ax2.set_ylabel("Погрешность", labelpad=15)
-        ax2.set_yscale("log")
-        ax2.grid(True)
+        # --- График погрешностей ---
+        if self.show_error_plot_var.get():
+            fig2 = plt.figure(figsize=(8, 4), dpi=100)
+            ax_error = fig2.add_subplot(1, 1, 1)
 
-        self.canvas = FigureCanvasTkAgg(self.figure, master=self.plot_frame)
-        self.canvas.draw()
-        self.canvas.get_tk_widget().pack()
+            ax_error.plot(x_vals_float, errors, 'g-')
+            ax_error.set_title("Погрешность на шаге")
+            ax_error.set_xlabel("x")
+            ax_error.set_ylabel("Погрешность")
+            ax_error.set_yscale("log")
+            ax_error.grid(True)
+
+        # --- Показываем всё одновременно ---
+        plt.show()  # ← откроет все созданные фигуры одновременно
 
 
 def main():
