@@ -3,6 +3,7 @@ package com.bachelorlabs.ports;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.time.Duration;
@@ -44,7 +45,8 @@ public class PortScanner {
     }
 
     private boolean tryConnect(InetAddress address, int port) {
-        try (Socket socket = new Socket()) {
+        try (Socket socket = new Socket(Proxy.NO_PROXY)) {
+            // Отказываемся от системных прокси, чтобы соединение отражало реальное состояние порта.
             socket.connect(new InetSocketAddress(address, port), (int) timeout.toMillis());
             return socket.isConnected();
         } catch (IOException ignored) {
