@@ -1,0 +1,50 @@
+package com.bachelorlabs.ports;
+
+import java.util.Objects;
+import java.util.Optional;
+
+/**
+ * Represents the result of a single port scan attempt.
+ */
+public final class PortScanResult {
+    private final int port;
+    private final String serviceName;
+
+    public PortScanResult(int port, String serviceName) {
+        this.port = port;
+        this.serviceName = serviceName;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public Optional<String> getServiceName() {
+        return Optional.ofNullable(serviceName);
+    }
+
+    @Override
+    public String toString() {
+        return "PortScanResult{" +
+                "port=" + port +
+                ", serviceName='" + serviceName + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PortScanResult)) {
+            return false;
+        }
+        PortScanResult that = (PortScanResult) o;
+        return port == that.port && Objects.equals(serviceName, that.serviceName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(port, serviceName);
+    }
+}
