@@ -7,12 +7,13 @@ import java.net.Proxy;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
- *  TCP-сканер, который проверяет порты по очереди.
+ * TCP-сканер, который проверяет порты параллельно.
  */
 public class PortScanner {
     private final Duration timeout;
@@ -23,16 +24,14 @@ public class PortScanner {
 
     public List<PortScanResult> scan(String host, int startPort, int endPort) throws HostResolutionException {
         InetAddress[] addresses = resolveAll(host);
-        List<PortScanResult> openPorts = new ArrayList<>();
 
-        for (int port = startPort; port <= endPort; port++) {
-            if (isPortReachable(addresses, port)) {
-                String serviceName = PortServiceRegistry.findService(port).orElse(null);
-                openPorts.add(new PortScanResult(port, serviceName));
-            }
-        }
-
-        return openPorts;
+        return IntStream.rangeClosed(startPort, endPort)
+                .parallel()
+                .mapToObj(port -> isPortReachable(addresses, port)
+                        ? new PortScanResult(port, PortServiceRegistry.findService(port).orElse(null))
+                        : null)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     private boolean isPortReachable(InetAddress[] addresses, int port) {
