@@ -6,7 +6,7 @@ import java.util.Locale;
 import java.util.Scanner;
 
 /**
- * Entry point of the console port scanner application.
+ * Место, где начинается работа приложения для сканирования порта с консоли
  */
 public class PortScannerApp {
     private static final int MIN_PORT = 1;

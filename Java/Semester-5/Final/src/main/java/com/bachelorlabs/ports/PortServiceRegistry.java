@@ -1,57 +1,46 @@
 package com.bachelorlabs.ports;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 /**
- * Provides human-readable names for common TCP ports.
+ * Приведены примеры под самые частые порты для удобства
  */
 public final class PortServiceRegistry {
     private static final Map<Integer, String> PORT_SERVICES;
 
     static {
-        Map<Integer, String> services = new HashMap<>();
-        services.put(20, "FTP (Data)");
-        services.put(21, "FTP");
-        services.put(22, "SSH");
-        services.put(23, "Telnet");
-        services.put(25, "SMTP");
-        services.put(53, "DNS");
-        services.put(67, "DHCP (Server)");
-        services.put(68, "DHCP (Client)");
-        services.put(69, "TFTP");
-        services.put(80, "HTTP");
-        services.put(110, "POP3");
-        services.put(123, "NTP");
-        services.put(143, "IMAP");
-        services.put(161, "SNMP");
-        services.put(389, "LDAP");
-        services.put(443, "HTTPS");
-        services.put(445, "SMB");
-        services.put(465, "SMTPS");
-        services.put(587, "Submission");
-        services.put(636, "LDAPS");
-        services.put(993, "IMAPS");
-        services.put(995, "POP3S");
-        services.put(1433, "MSSQL");
-        services.put(1521, "Oracle DB");
-        services.put(1723, "PPTP");
-        services.put(1883, "MQTT");
-        services.put(2049, "NFS");
-        services.put(2375, "Docker");
-        services.put(3306, "MySQL");
-        services.put(3389, "RDP");
-        services.put(5432, "PostgreSQL");
-        services.put(5900, "VNC");
-        services.put(6379, "Redis");
-        services.put(8080, "HTTP (Alt)");
-        services.put(8443, "HTTPS (Alt)");
-        services.put(9000, "SonarQube");
-        services.put(9200, "Elasticsearch");
-        services.put(11211, "Memcached");
-        PORT_SERVICES = Collections.unmodifiableMap(services);
+        PORT_SERVICES = Map.ofEntries(
+                Map.entry(20, "FTP (Data)"),
+                Map.entry(21, "FTP"),
+                Map.entry(22, "SSH"),
+                Map.entry(23, "Telnet"),
+                Map.entry(25, "SMTP"),
+                Map.entry(53, "DNS"),
+                Map.entry(67, "DHCP (Server)"),
+                Map.entry(68, "DHCP (Client)"),
+                Map.entry(69, "TFTP"),
+                Map.entry(80, "HTTP"),
+                Map.entry(110, "POP3"),
+                Map.entry(123, "NTP"),
+                Map.entry(143, "IMAP"),
+                Map.entry(161, "SNMP"),
+                Map.entry(389, "LDAP"),
+                Map.entry(443, "HTTPS"),
+                Map.entry(445, "SMB"),
+                Map.entry(465, "SMTPS"),
+                Map.entry(1433, "MSSQL"),
+                Map.entry(1521, "Oracle DB"),
+                Map.entry(2375, "Docker"),
+                Map.entry(3306, "MySQL"),
+                Map.entry(3389, "RDP"),
+                Map.entry(5432, "PostgreSQL"),
+                Map.entry(6379, "Redis"),
+                Map.entry(8080, "HTTP (Alt)"),
+                Map.entry(8443, "HTTPS (Alt)"),
+                Map.entry(9200, "Elasticsearch"),
+                Map.entry(11211, "Memcached")
+        );
     }
 
     private PortServiceRegistry() {

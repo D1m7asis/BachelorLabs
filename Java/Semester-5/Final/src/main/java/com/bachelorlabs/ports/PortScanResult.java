@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Represents the result of a single port scan attempt.
+ * Показывает, что получилось при сканировании одного порта
  */
 public final class PortScanResult {
     private final int port;
@@ -36,10 +36,9 @@ public final class PortScanResult {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof PortScanResult)) {
+        if (!(o instanceof PortScanResult that)) {
             return false;
         }
-        PortScanResult that = (PortScanResult) o;
         return port == that.port && Objects.equals(serviceName, that.serviceName);
     }
 

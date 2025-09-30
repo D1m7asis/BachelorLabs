@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Консервативный TCP-сканер. Проверяет порты по очереди.
+ *  TCP-сканер, который проверяет порты по очереди.
  */
 public class PortScanner {
     private final Duration timeout;
@@ -45,8 +45,7 @@ public class PortScanner {
     }
 
     private boolean tryConnect(InetAddress address, int port) {
-        try (Socket socket = new Socket(Proxy.NO_PROXY)) {
-            // Отказываемся от системных прокси, чтобы соединение отражало реальное состояние порта.
+        try (Socket socket = new Socket(Proxy.NO_PROXY)) {  // Решил отключить прокси т.к. из-за них багалось корректное отобржение портов
             socket.connect(new InetSocketAddress(address, port), (int) timeout.toMillis());
             return socket.isConnected();
         } catch (IOException ignored) {
