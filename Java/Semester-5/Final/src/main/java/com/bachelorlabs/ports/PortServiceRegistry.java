@@ -47,6 +47,6 @@ public final class PortServiceRegistry {
     }
 
     public static Optional<String> findService(int port) {
-        return Optional.ofNullable(PORT_SERVICES.get(port));
+        return Optional.ofNullable(PORT_SERVICES.get(port)); // Решил вернуть Optional, чтобы можно было аккуратно подписывать только известные сервисы
     }
 }

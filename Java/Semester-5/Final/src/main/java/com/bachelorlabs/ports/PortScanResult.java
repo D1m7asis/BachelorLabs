@@ -20,7 +20,7 @@ public final class PortScanResult {
     }
 
     public Optional<String> getServiceName() {
-        return Optional.ofNullable(serviceName);
+        return Optional.ofNullable(serviceName); // Решил не заставлять всех знать сервис, поэтому он опциональный
     }
 
     @Override

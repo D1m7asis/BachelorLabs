@@ -37,7 +37,7 @@ public class PortScannerApp {
                         System.out.println("Завершение работы приложения.");
                         return;
                     case "scan":
-                        handleScanCommand(scanner, tokens);
+                        handleScanCommand(scanner, tokens); // Решил вынести обработку сканирования в отдельный метод, чтобы main не разрастался
                         break;
                     default:
                         System.out.println("Неизвестная команда. Введите 'help' для списка команд.");
@@ -70,7 +70,7 @@ public class PortScannerApp {
             List<PortScanResult> openPorts = scanner.scan(host, startPort, endPort);
             printResults(host, openPorts);
         } catch (PortScanner.HostResolutionException e) {
-            System.out.println(e.getMessage());
+            System.out.println(e.getMessage()); // Решил показать пользователю понятный текст ошибки вместо стека
         }
     }
 
@@ -83,7 +83,7 @@ public class PortScannerApp {
         System.out.println("Открытые порты на хосте " + host + ":");
         for (PortScanResult result : openPorts) {
             StringBuilder line = new StringBuilder("+ ").append(result.getPort());
-            result.getServiceName().ifPresent(name -> line.append(" (").append(name).append(")"));
+            result.getServiceName().ifPresent(name -> line.append(" (").append(name).append(")")); // Решил подписывать популярные сервисы, чтобы было понятнее что нашли
             System.out.println(line);
         }
     }
