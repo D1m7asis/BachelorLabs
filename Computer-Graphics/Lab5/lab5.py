@@ -1,11 +1,19 @@
 import sys
 
+from PIL import Image
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
     QFileDialog, QComboBox, QSlider
 )
+
+
+def pil_to_qimage(img: Image.Image) -> QImage:
+    img = img.convert("RGBA")
+    data = img.tobytes("raw", "RGBA")
+    qimg = QImage(data, img.width, img.height, QImage.Format_RGBA8888)
+    return qimg.copy()
 
 
 class BMViewer(QWidget):
@@ -28,7 +36,11 @@ class BMViewer(QWidget):
         self.scale_slider.valueChanged.connect(self.on_scale_changed)
 
         self.mode_combo = QComboBox()
-        self.mode_combo.addItems(["По соседним", "Линейная интерполяция", "Сплайновая интерполяция"])
+        self.mode_combo.addItems([
+            "По соседним",
+            "Линейная интерполяция",
+            "Сплайновая (бикубическая) интерполяция",
+        ])
         self.mode_combo.currentIndexChanged.connect(self.update_scaled_image)
 
         controls = QHBoxLayout()
@@ -42,17 +54,18 @@ class BMViewer(QWidget):
         layout.addLayout(controls)
         layout.addWidget(self.image_label)
 
-        self.original_image = None
+        self.pil_original: Image.Image | None = None
 
     def load_image(self):
         fname, _ = QFileDialog.getOpenFileName(self, "Открыть BMP", "", "BMP files (*.bmp)")
         if not fname:
             return
-        image = QImage(fname)
-        if image.isNull():
-            self.image_label.setText("Ошибка загрузки BMP")
+        try:
+            self.pil_original = Image.open(fname).convert("RGBA")
+        except Exception as e:
+            self.image_label.setText(f"Ошибка загрузки BMP: {e}")
+            self.pil_original = None
             return
-        self.original_image = image
         self.update_scaled_image()
 
     def on_scale_changed(self, val):
@@ -60,24 +73,24 @@ class BMViewer(QWidget):
         self.update_scaled_image()
 
     def update_scaled_image(self):
-        if self.original_image is None:
+        if self.pil_original is None:
             return
+
         factor = self.scale_slider.value() / 100.0
-        w = max(1, int(self.original_image.width() * factor))
-        h = max(1, int(self.original_image.height() * factor))
+        w = max(1, int(self.pil_original.width * factor))
+        h = max(1, int(self.pil_original.height * factor))
 
         mode = self.mode_combo.currentText()
         if mode == "По соседним":
-            transform_mode = Qt.FastTransformation
-            img = self.original_image.scaled(w, h, Qt.IgnoreAspectRatio, transform_mode)
+            resample = Image.NEAREST
         elif mode == "Линейная интерполяция":
-            img = self.original_image.scaled(w, h, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+            resample = Image.BILINEAR
         else:
-            # Сплайновая: для простоты — два прохода сглаживания
-            temp = self.original_image.scaled(w, h, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
-            img = temp.scaled(w, h, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+            resample = Image.BICUBIC
 
-        self.image_label.setPixmap(QPixmap.fromImage(img))
+        resized = self.pil_original.resize((w, h), resample=resample)
+        qimg = pil_to_qimage(resized)
+        self.image_label.setPixmap(QPixmap.fromImage(qimg))
 
 
 if __name__ == "__main__":
