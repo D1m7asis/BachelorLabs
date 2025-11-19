@@ -14,3 +14,7 @@ _deps
 *build
 *cmake-build-debug
 *.pyc
+/Computer-Graphics/MuseumPulseFinal/main.dist
+/Computer-Graphics/MuseumPulseFinal/dist
+Computer-Graphics/MuseumPulseFinal/main.exe
+Computer-Graphics/MuseumPulseFinal/MuseumPulse.spec
