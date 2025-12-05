@@ -30,3 +30,10 @@ SET product_type = 'Копия издания'
 WHERE edition_id IN (
     SELECT id FROM editions WHERE title LIKE '%(копия)%'
 );
+
+-- UPDATE 6: обновление info для авторов без адреса используя селект в сете
+UPDATE authors
+SET info = 'Homeless'
+WHERE id IN (
+    SELECT id FROM authors WHERE address IS NULL OR address = ''
+);

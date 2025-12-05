@@ -28,3 +28,7 @@ VALUES(1,1,'Книга','2025-01-01','2025-01-05');
 -- FAIL CHECK date_completed < date_received
 INSERT INTO orders(customer_id, edition_id, product_type, date_received, date_completed)
 VALUES(1,1,'Книга','2025-01-05','2025-01-01');
+
+-- неверный INSERT (нет такой типографии)
+INSERT INTO orders (id, customer_id, edition_id, typography_id, product_type, date_received, is_completed)
+VALUES (1, 1, 1, 9999, 'book', CURRENT_DATE, false);  -- должна быть ошибка FK

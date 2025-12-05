@@ -21,3 +21,8 @@ UPDATE orders SET date_completed='2025-01-10' WHERE id=1;
 
 -- 7. FAIL CHECK: completed earlier than received
 UPDATE orders SET date_completed='2024-12-01' WHERE id=1;
+
+-- некорректный UPDATE (дата выполнения раньше даты приёма)
+UPDATE orders
+SET date_completed = date_received - INTERVAL '1 day'
+WHERE id = 3;   -- должна выдать ошибку chk_orders_dates
