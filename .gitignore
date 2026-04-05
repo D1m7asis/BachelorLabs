@@ -1,20 +1,28 @@
-CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-_deps
-*.vs
-*.idea
+# CMake / build artifacts
 *build
 *cmake-build-debug
+CMakeCache.txt
+CMakeFiles
+CMakeLists.txt.user
+CMakeScripts
+CTestTestfile.cmake
+Makefile
+Testing
+_deps
+cmake_install.cmake
+compile_commands.json
+install_manifest.txt
+
+# IDE settings
+*.idea
+*.vs
+
+# Python / Jupyter
+*.ipynb_checkpoints
 *.pyc
-/Computer-Graphics/MuseumPulseFinal/main.dist
+
+# Project-specific artifacts
 /Computer-Graphics/MuseumPulseFinal/dist
+/Computer-Graphics/MuseumPulseFinal/main.dist
 Computer-Graphics/MuseumPulseFinal/main.exe
 Computer-Graphics/MuseumPulseFinal/MuseumPulse.spec
