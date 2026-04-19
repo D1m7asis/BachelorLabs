@@ -12,6 +12,7 @@ services:
     volumes:
       - ./init:/docker-entrypoint-initdb.d
       - ../Semester-5:/opt/semester-5:ro
+      - ../Semester-6:/opt/semester-6:ro
       - pgdata:/var/lib/postgresql/data
 
 volumes:
