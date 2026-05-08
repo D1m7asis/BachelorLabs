@@ -20,6 +20,14 @@ install_manifest.txt
 # Python / Jupyter
 *.ipynb_checkpoints
 *.pyc
+*.pyo
+__pycache__/
+.venv/
+.env
+
+# JavaScript
+node_modules/
+dist/
 
 # Project-specific artifacts
 /Computer-Graphics/MuseumPulseFinal/dist
